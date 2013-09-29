@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +53,7 @@ class KnapsackItem implements Comparable<KnapsackItem> {
 
 
 	public int compareTo(KnapsackItem o) {
-		return ratio.compareTo(o.ratio);
+		return o.ratio.compareTo(ratio);
 	}	
 }
 
@@ -102,6 +101,9 @@ public class Knapsack {
 			KnapsackProblem bruteForceProblem = bruteForceProblem(id, n, m, w, c);
 			KnapsackProblem heuristicProblem = knapsackHeuristicCWRatio(id, n, m, w, c);
 			
+			double relativeError = (double)(bruteForceProblem.solution.cost - heuristicProblem.solution.cost) / (double)bruteForceProblem.solution.cost;
+			System.out.println(relativeError);
+			
 
 		}
 
@@ -122,8 +124,7 @@ public class Knapsack {
 		long end = System.nanoTime();
 
 		System.out.println(problem);
-		System.out.println(TimeUnit.SECONDS.convert((end - start),
-				TimeUnit.NANOSECONDS));
+		System.out.println((end - start));
 		/*
 		 * System.out.print(id + " "+ n +" "+ res); for(int i = 0; i < n;i++) {
 		 * System.out.print(" " +problem.solution.pr[i]); }
@@ -188,8 +189,8 @@ public class Knapsack {
 		this.mask = new int[c.length];
 		ArrayList<KnapsackItem> ratioList = new ArrayList<KnapsackItem>();
 		
-		long start = System.nanoTime();
 		
+		long start = System.nanoTime();
 		for(int i = 0; i < w.length ; i++) {			
 			Double ratio = new Double((double)c[i]/(double)w[i]);			
 			ratioList.add(new KnapsackItem(ratio, i));
@@ -214,8 +215,7 @@ public class Knapsack {
 		
 		long end = System.nanoTime();
 		System.out.println(problem);
-		System.out.println(TimeUnit.SECONDS.convert((end - start),
-				TimeUnit.NANOSECONDS));
+		System.out.println(end - start);
 		
 		
 		
