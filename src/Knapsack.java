@@ -3,7 +3,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
 
 class KnapsackProblem {
 
@@ -37,9 +36,7 @@ class KnapsackProblem {
 class KnapsackItem implements Comparable<KnapsackItem> {
 	Double ratio;
 	int position;
-	
-	
-	
+
 	/**
 	 * @param ratio
 	 * @param position
@@ -50,11 +47,9 @@ class KnapsackItem implements Comparable<KnapsackItem> {
 		this.position = position;
 	}
 
-
-
 	public int compareTo(KnapsackItem o) {
 		return o.ratio.compareTo(ratio);
-	}	
+	}
 }
 
 class KnapsackSolution {
@@ -71,11 +66,12 @@ class KnapsackSolution {
 
 public class Knapsack {
 
-	String testFile = "inst/knap_4.inst.dat";
+	String testFile = "inst/knap_30.inst.dat";
 	Scanner sc = null;
 	KnapsackProblem currentProblem;
 	int mask[];
 	int currentCost;
+	int debugPrint;
 
 	public void run() throws FileNotFoundException {
 		sc = new Scanner(new File(testFile));
@@ -98,12 +94,21 @@ public class Knapsack {
 
 			// RunBruteforce problem
 			// obtain result and print it
-			KnapsackProblem bruteForceProblem = bruteForceProblem(id, n, m, w, c);
-			KnapsackProblem heuristicProblem = knapsackHeuristicCWRatio(id, n, m, w, c);
 			
-			double relativeError = (double)(bruteForceProblem.solution.cost - heuristicProblem.solution.cost) / (double)bruteForceProblem.solution.cost;
-			System.out.println(relativeError);
+			this.debugPrint = 3;
 			
+			KnapsackProblem bruteForceProblem = bruteForceProblem(id, n, m, w,
+					c);
+			KnapsackProblem heuristicProblem = knapsackHeuristicCWRatio(id, n,
+					m, w, c);
+
+			double relativeError = (double) (bruteForceProblem.solution.cost - heuristicProblem.solution.cost)
+					/ (double) bruteForceProblem.solution.cost;
+
+			//if (this.debugPrint == 3) {
+				System.out.print("\t"+relativeError);
+			//}
+			 System.out.println("");
 
 		}
 
@@ -123,8 +128,10 @@ public class Knapsack {
 
 		long end = System.nanoTime();
 
-		System.out.println(problem);
-		System.out.println((end - start));
+		// System.out.println(problem);
+		//if (this.debugPrint == 1) {
+			System.out.print((end - start));
+		//}
 		/*
 		 * System.out.print(id + " "+ n +" "+ res); for(int i = 0; i < n;i++) {
 		 * System.out.print(" " +problem.solution.pr[i]); }
@@ -156,9 +163,8 @@ public class Knapsack {
 	 * int sumhelper(int mask[], int list[]) { int sum = 0; for (int i = 0; i <
 	 * mask.length; i++) { if (mask[i] == 1) sum += list[i]; } return sum; }
 	 */
-	
-	
-	//Brute force method
+
+	// Brute force method
 	private void knapsackBF(int index, int state, int w, int c) {
 
 		if (index >= 0) {
@@ -181,46 +187,46 @@ public class Knapsack {
 		}
 
 	}
-	
-	private KnapsackProblem knapsackHeuristicCWRatio(int id, int n, int m, int[] w, int[] c) {
-		
+
+	private KnapsackProblem knapsackHeuristicCWRatio(int id, int n, int m,
+			int[] w, int[] c) {
+
 		KnapsackProblem problem = new KnapsackProblem(w, c, m, id);
 		currentProblem = problem;
 		this.mask = new int[c.length];
 		ArrayList<KnapsackItem> ratioList = new ArrayList<KnapsackItem>();
-		
-		
+
 		long start = System.nanoTime();
-		for(int i = 0; i < w.length ; i++) {			
-			Double ratio = new Double((double)c[i]/(double)w[i]);			
+		for (int i = 0; i < w.length; i++) {
+			Double ratio = new Double((double) c[i] / (double) w[i]);
 			ratioList.add(new KnapsackItem(ratio, i));
 		}
-		
+
 		Collections.sort(ratioList);
 		int capacity = m;
-		
-		for(KnapsackItem item : ratioList) {
-			
+
+		for (KnapsackItem item : ratioList) {
+
 			int tmpWeight = problem.weights[item.position];
-			
+
 			capacity -= tmpWeight;
-			if(capacity >= 0) {
+			if (capacity >= 0) {
 				this.currentProblem.solution.cost += c[item.position];
-				this.currentProblem.solution.precense[item.position] = 1;				
+				this.currentProblem.solution.precense[item.position] = 1;
 			} else {
-				break;
-			}		
+				capacity += tmpWeight;
+			//	break;
+			}
 		}
-		
-		
+
 		long end = System.nanoTime();
-		System.out.println(problem);
-		System.out.println(end - start);
-		
-		
-		
+		// System.out.println(problem);
+		//if (this.debugPrint == 2) {
+			System.out.print("\t"+(end - start));
+		//}
+
 		return problem;
-		
+
 	}
 
 	/**
